@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="casanova-runtime" content="portable">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f4f1ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161513" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Casanova">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Diseño de muebles de melamina: de una foto a un modelo 3D editable y su despiece.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="iconos/apple-touch-icon.png">
+<title>Casanova Designer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 rx=%223%22 fill=%22%23b5651d%22/%3E%3Cpath d=%22M3 3h10v10H3z%22 fill=%22none%22 stroke=%22%23fff%22 stroke-width=%221.5%22/%3E%3Cpath d=%22M3 8h10%22 stroke=%22%23fff%22 stroke-width=%221.5%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports": {"three": "./vendor/three.module.js", "three/addons/": "./vendor/"}}</script>
+</head>
+<body>
+<header class="barra">
+  <div class="marca"><span class="logo" aria-hidden="true"></span><strong>Casanova</strong><span class="tenue">Designer</span></div>
+  <input id="nombre-proyecto" class="nombre" aria-label="Nombre del proyecto" spellcheck="false">
+  <div id="estado-fabricacion" class="chip" role="status">Sin calcular</div>
+  <nav class="acciones">
+    <button id="btn-deshacer" class="icono" title="Deshacer (Ctrl+Z)" aria-label="Deshacer">↶</button>
+    <button id="btn-rehacer" class="icono" title="Rehacer (Ctrl+Y)" aria-label="Rehacer">↷</button>
+    <button id="btn-mas" class="icono solo-movil" aria-label="Más acciones" aria-expanded="false" aria-controls="acciones-extra">⋯</button>
+    <div id="acciones-extra" class="acciones-extra">
+    <div class="menu">
+      <button id="btn-nuevo">Nuevo ▾</button>
+      <div id="menu-nuevo" class="desplegable" hidden></div>
+    </div>
+    <div class="menu">
+      <button id="btn-abrir">Abrir ▾</button>
+      <div id="menu-abrir" class="desplegable" hidden></div>
+    </div>
+    <button id="btn-guardar">Guardar</button>
+    <button id="btn-confirmar" class="primario">Confirmar diseño</button>
+    <button id="btn-csv">Lista de cortes CSV</button>
+    <button id="btn-svg">Planos SVG</button>
+    <button id="btn-imprimir">Imprimir planos</button>
+    <a class="boton-enlace" href="instalar.html">Instalar o compartir</a>
+    </div>
+  </nav>
+</header>
+
+<div id="aviso-motor" class="aviso" hidden></div>
+
+<main class="area">
+  <aside class="lateral" aria-label="Edición">
+    <div class="pestanas" role="tablist">
+      <button role="tab" data-panel="p-referencia" aria-selected="true">Referencia</button>
+      <button role="tab" data-panel="p-estructura">Estructura</button>
+      <button role="tab" data-panel="p-armado">Armado</button>
+      <button role="tab" data-panel="p-herrajes">Herrajes</button>
+      <button role="tab" data-panel="p-asistente">Asistente</button>
+    </div>
+
+    <section id="p-referencia" class="panel" role="tabpanel">
+      <h2>1. Referencia</h2>
+      <label id="zona-imagen" class="zona-imagen" tabindex="0">
+        <input id="archivo-imagen" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+        <img id="vista-imagen" alt="Imagen de referencia" hidden>
+        <span id="texto-zona">Arrastra aquí un plano, croquis o foto, o haz clic para elegirla.</span>
+      </label>
+      <div class="fila-check">
+        <label><input type="checkbox" id="ver-referencia"> Mostrar sobre el visor</label>
+        <input type="range" id="opacidad-referencia" min="10" max="100" value="45" aria-label="Opacidad de la referencia">
+        <button id="quitar-imagen" class="texto" hidden>Quitar</button>
+      </div>
+
+      <h2>2. Datos que conoces</h2>
+      <div class="rejilla-3">
+        <label>Ancho mm<input type="number" id="pista-ancho" min="1" step="1"></label>
+        <label>Alto mm<input type="number" id="pista-alto" min="1" step="1"></label>
+        <label>Fondo mm<input type="number" id="pista-fondo" min="1" step="1"></label>
+      </div>
+      <label>Espesor melamina mm<input type="number" id="pista-espesor" min="1" step="0.5" value="18"></label>
+      <label>Requisitos especiales<textarea id="pista-notas" rows="3" placeholder="Ej.: cajones con correderas laterales, zócalo de 100 mm, fondo de 3 mm sobrepuesto"></textarea></label>
+      <div class="fila-botones">
+        <button id="btn-aplicar-medidas">Aplicar medidas al diseño</button>
+        <button id="btn-analizar" class="primario">Analizar imagen</button>
+      </div>
+      <p id="estado-ia" class="nota"></p>
+      <div id="resultado-ia"></div>
+
+      <h2>3. Revisa y corrige</h2>
+      <p class="nota">Selecciona una pieza en el 3D o una celda en <b>Estructura</b> para cambiarla. Cada cambio se recalcula con el motor; la lista de cortes y los planos salen del mismo cálculo.</p>
+      <label class="fila-check"><input type="checkbox" id="referencia-revisada"> Revisé que la distribución corresponde a la referencia</label>
+    </section>
+
+    <section id="p-asistente" class="panel panel-asistente" role="tabpanel" hidden>
+      <div id="asistente" class="asistente"></div>
+    </section>
+
+    <section id="p-estructura" class="panel" role="tabpanel" hidden>
+      <h2>Distribución</h2>
+      <div id="arbol" class="arbol" role="tree"></div>
+      <div id="editor-nodo"></div>
+    </section>
+
+    <section id="p-armado" class="panel" role="tabpanel" hidden>
+      <div id="form-armado"></div>
+    </section>
+
+    <section id="p-herrajes" class="panel" role="tabpanel" hidden>
+      <div id="form-herrajes"></div>
+      <details class="avanzado">
+        <summary>Proyecto en JSON (avanzado)</summary>
+        <textarea id="json-proyecto" rows="16" spellcheck="false"></textarea>
+        <div class="fila-botones">
+          <button id="btn-json-aplicar">Aplicar JSON</button>
+          <button id="btn-json-descargar">Descargar JSON</button>
+        </div>
+      </details>
+    </section>
+  </aside>
+
+  <section class="visor-zona" aria-label="Modelo 3D">
+    <div class="herramientas-visor">
+      <div class="grupo" role="group" aria-label="Vista">
+        <button data-vista="iso" class="activo">3D</button>
+        <button data-vista="frente">Frente</button>
+        <button data-vista="lado">Lado</button>
+        <button data-vista="arriba">Planta</button>
+      </div>
+      <div class="grupo" role="group" aria-label="Frentes">
+        <button data-frentes="normal" class="activo">Frentes</button>
+        <button data-frentes="transparente">Translúcidos</button>
+        <button data-frentes="oculto">Sin frentes</button>
+      </div>
+      <label class="fila-check"><input type="checkbox" id="ver-fondo" checked> Fondo</label>
+      <label class="fila-check"><input type="checkbox" id="explosion"> Abrir cajones</label>
+    </div>
+    <div id="visor" class="visor">
+      <img id="referencia-superpuesta" alt="" hidden>
+      <div id="tooltip" class="tooltip" hidden></div>
+      <div id="ficha-pieza" class="ficha" hidden></div>
+    </div>
+  </section>
+
+  <aside class="resultados" aria-label="Resultados">
+    <div class="pestanas" role="tablist">
+      <button role="tab" data-panel="r-piezas" aria-selected="true">Piezas</button>
+      <button role="tab" data-panel="r-cajones">Cajones</button>
+      <button role="tab" data-panel="r-puertas">Puertas</button>
+      <button role="tab" data-panel="r-revision">Revisión <span id="contador-issues" class="contador"></span></button>
+      <button role="tab" data-panel="r-planos">Planos</button>
+    </div>
+    <section id="r-piezas" class="panel" role="tabpanel">
+      <div class="fila-check">
+        <label><input type="checkbox" id="agrupar-iguales" checked> Agrupar piezas iguales</label>
+      </div>
+      <div id="tabla-piezas"></div>
+    </section>
+    <section id="r-cajones" class="panel" role="tabpanel" hidden><div id="lista-cajones"></div></section>
+    <section id="r-puertas" class="panel" role="tabpanel" hidden><div id="lista-puertas"></div></section>
+    <section id="r-revision" class="panel" role="tabpanel" hidden><div id="revision"></div></section>
+    <section id="r-planos" class="panel" role="tabpanel" hidden><div id="planos"></div></section>
+  </aside>
+</main>
+
+<nav class="nav-movil" aria-label="Secciones">
+  <button data-seccion="modelo" aria-current="page"><span aria-hidden="true">◳</span>Modelo</button>
+  <button data-seccion="disenar"><span aria-hidden="true">✎</span>Diseñar</button>
+  <button data-seccion="asistente"><span aria-hidden="true">💬</span>Asistente</button>
+  <button data-seccion="despiece"><span aria-hidden="true">☰</span>Despiece</button>
+</nav>
+
+<div id="impresion" class="solo-impresion"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

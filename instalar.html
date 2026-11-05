@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f1c18">
+<title>Instalar Casanova Designer</title>
+<link rel="icon" href="iconos/icono-192.png">
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eeeae4;background:#1f1c18;color-scheme:dark}*{box-sizing:border-box}body{margin:0;padding:32px 22px max(36px,env(safe-area-inset-bottom));line-height:1.55}main{max-width:570px;margin:6vh auto}img{width:76px;height:76px;border-radius:18px}h1{font-size:32px;line-height:1.12;letter-spacing:-.025em;margin:20px 0 12px}p,li{font-size:17px}p{color:#c5bbae}ol{padding-left:24px;margin:30px 0}li{padding:0 0 18px 8px}a,button{font:inherit;color:inherit}a.abrir,button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 20px;border-radius:9px;border:1px solid #76634e;text-decoration:none;cursor:pointer;background:transparent}a.abrir{background:#e08a3c;color:#1a1208;border-color:#e08a3c;font-weight:650;margin-right:8px}button{margin-top:10px}:focus-visible{outline:3px solid #8fb4ea;outline-offset:4px}.nota{font-size:14px;color:#b7ad9f;margin-top:30px}footer{border-top:1px solid #4e463c;margin-top:32px;padding-top:20px}footer a{color:#ecad74}#aviso{min-height:24px;font-size:14px}
+</style>
+</head>
+<body><main>
+<img src="iconos/apple-touch-icon.png" alt="Casanova Designer">
+<h1>Tu taller, en el iPhone.</h1>
+<p>Casanova Designer se instala desde Safari y queda con su propio icono en la pantalla de inicio.</p>
+<a class="abrir" href="./">Abrir aplicación</a>
+<button id="compartir" type="button">Compartir con un amigo</button>
+<ol>
+<li>Abre la aplicación en <strong>Safari</strong>.</li>
+<li>Toca <strong>Compartir</strong> y luego <strong>Añadir a pantalla de inicio</strong>.</li>
+<li>Si aparece, activa <strong>Abrir como app</strong> y toca <strong>Añadir</strong>.</li>
+</ol>
+<p>En la primera apertura, espera a que termine de cargar el motor. Después podrás editar y calcular sin conexión. Guarda tus proyectos y descarga una copia JSON para respaldarlos.</p>
+<p>El asistente y la interpretación de fotos necesitan internet y una conexión de IA activada por el propietario.</p>
+<p id="aviso" role="status"></p>
+<footer><p class="nota">La aplicación también funciona en Android y en computador. Los archivos APK se utilizan en Android; en iPhone se comparte este enlace.</p><a href="https://support.apple.com/es-cl/guide/iphone/iphea86e5236/ios" target="_blank" rel="noopener">Instrucciones de Apple</a></footer>
+</main>
+<script type="module">
+document.getElementById("compartir").addEventListener("click",async()=>{
+  let url = new URL("./",location.href).href;
+  try { const code=sessionStorage.getItem("casanova-access"); if(code)url+="#acceso="+encodeURIComponent(code); } catch {}
+  const data={title:"Casanova Designer",text:"Abre Casanova Designer en Safari. Para instalar: Compartir → Añadir a pantalla de inicio.",url};
+  try {
+    if(navigator.share)await navigator.share(data);
+    else { await navigator.clipboard.writeText(url);document.getElementById("aviso").textContent="Enlace copiado. Ya puedes enviárselo a tu amigo."; }
+  }catch(error){if(error.name!=="AbortError")document.getElementById("aviso").textContent="Puedes copiar la dirección del navegador y compartirla.";}
+});
+</script></body></html>

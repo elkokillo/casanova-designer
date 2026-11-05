@@ -1,0 +1,8 @@
+{
+  "engine": {
+    "__init__.py": "204f8a5c30e0177b8b6f3f76a258159ba3bf8e594fa29eb099f8dd6e8f2538ca",
+    "engine.py": "8509c5bd7ba3c5e0c429a2b8214ebfb27e2a05d24222f593e2ca801597f2c17b",
+    "drawings.py": "f3cd811bad2b39c8955b79aa7148d4f087fb1dc4bf428ee99a41a0fe21e715b1"
+  },
+  "pyodide": "0.29.3"
+}

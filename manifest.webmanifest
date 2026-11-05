@@ -1,0 +1,17 @@
+{
+  "name": "Casanova Designer",
+  "short_name": "Casanova",
+  "description": "Diseño de muebles de melamina: de una foto a un modelo 3D editable y su despiece.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f1ec",
+  "theme_color": "#b5651d",
+  "icons": [
+    { "src": "iconos/icono-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "iconos/icono-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
